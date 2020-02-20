@@ -18,10 +18,12 @@ class Library
 
   def pick_books
     return if books.empty?
+    return if books.map { |id| $books[id] }.sum == 0
     books.sort_by! { |id| $books[id] }
+
     can_ship_books.times do
       break if books.empty?
-      book_id =  books.pop
+      book_id = books.pop
       $books[book_id] = 0
       @picked_books << book_id
     end
