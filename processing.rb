@@ -23,6 +23,7 @@ class Processing
       next if picked_books.count == 0
       @picked_libraries << library
       @picked_books << picked_books
+      picked_books.each { |book_id| $books[book_id] = 0 }
       days = days + library.signup_time
     end
   end
