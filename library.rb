@@ -8,9 +8,16 @@ class Library
     @books = books
   end
 
-  def score
-    books_value = books.inject(0) { |sum, book_id| sum + $books[book_id]  }
-    books_value_per_day = books_value / can_ship_books
-    books_value_per_day / signup_time
+  def pick_books(picked_books, days_left)
+    library_books = @books - picked_books
+    books = library_books.sort_by { |id| $books[id] }.reverse
+    busy_days = days_left - signup_time
+    total_books = can_ship_books * busy_days
+    return [] if total_books <= 0
+    books.first([[total_books, books.count].min, 0].max)
+  end
+
+  def score_by(picked_books, days_left)
+    pick_books(picked_books, days_left).inject(0) { |sum, book_id| sum + $books[book_id]  }
   end
 end
