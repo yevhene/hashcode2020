@@ -7,7 +7,7 @@ class Processing
   end
 
   def pick_library
-    @libraries.sort_by(&:score).shift
+    @libraries.sort_by!(&:score).shift
   end
 
   def pick_books(library, days_left)
