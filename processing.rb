@@ -10,15 +10,20 @@ class Processing
     @libraries.shift
   end
 
-  def pick_books(library)
+  def pick_books(library, days_left)
     library_books = library.books - @picked_books.flatten
-    library_books.sort_by { |id| $books[id] }.reverse
+    books = library_books.sort_by { |id| $books[id] }.reverse
+    books.first([[days_left * library.can_ship_books, books.count].min, 0].max)
   end
 
   def run
+    days = 0
     while library = pick_library do
+      picked_books = pick_books(library, $days - days)
+      next if picked_books.count == 0
       @picked_libraries << library
-      @picked_books << pick_books(library)
+      @picked_books << picked_books
+      days = days + library.signup_time
     end
   end
 
