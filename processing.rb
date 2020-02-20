@@ -6,25 +6,21 @@ class Processing
     @picked_books = []
   end
 
-  def pick_library
-    @libraries.sort_by!(&:score).shift
-  end
-
-  def pick_books(library, days_left)
-    # library_books = library.books - @picked_books.flatten
-    books = library.books.sort_by { |id| $books[id] }.reverse
-    books.first([[days_left * library.can_ship_books, books.count].min, 0].max)
+  def pick_library(days_left)
+    @libraries.sort_by! { |library| library.score(days_left) }.pop
   end
 
   def run
-    days = 0
-    while library = pick_library do
-      picked_books = pick_books(library, $days - days)
-      next if picked_books.count == 0
-      @picked_libraries << library
-      @picked_books << picked_books
-      picked_books.each { |book_id| $books[book_id] = 0 }
-      days = days + library.signup_time
+    days_left = $days
+    while days_left > 0 do
+      library = pick_library(days_left)
+      @picked_libraries << library if library
+      @picked_libraries.each(&:pick_books)
+      if library
+        days_left -= library.signup_time
+      else
+        days_left -= 1
+      end
     end
   end
 
@@ -32,9 +28,9 @@ class Processing
     count = @picked_libraries.count
     puts count
     count.times do |i|
-      picked_books = @picked_books[i]
-      puts "#{@picked_libraries[i].id} #{picked_books.count}"
-      puts picked_books.join(' ')
+      library = @picked_libraries[i]
+      puts "#{library.id} #{library.picked_books.count}"
+      puts library.picked_books.join(' ')
     end
   end
 end
