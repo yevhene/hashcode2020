@@ -7,12 +7,12 @@ class Processing
   end
 
   def pick_library
-    libraries.sort_by(&:score).shift
+    @libraries.sort_by(&:score).shift
   end
 
   def pick_books(library, days_left)
     # library_books = library.books - @picked_books.flatten
-    books = library_books.sort_by { |id| $books[id] }.reverse
+    books = library.books.sort_by { |id| $books[id] }.reverse
     books.first([[days_left * library.can_ship_books, books.count].min, 0].max)
   end
 
